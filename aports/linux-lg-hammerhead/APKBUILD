@@ -11,29 +11,27 @@
 
 _vendor=lg
 _flavor=lg-hammerhead
-_hash="1dae34efb7d2399073ca371c953aafd2ed503849"
+_hash="ea094f3c830a67f252677aacba5d04ebcf55c4d9"
 _config="config-${_flavor}.armhf"
 
 pkgname=linux-${_flavor}
-pkgver=3.4.0
+pkgver=4.11
 case $pkgver in
 	*.*.*)  _kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
 pkgrel=3
 arch="armhf"
-pkgdesc="LineageOS kernel for Nexus 5 hammerhead"
-url="https://github.com/LineageOS/android_kernel_lge_hammerhead"
+pkgdesc="Linux mainline for Nexus 5 hammerhead"
+url="https://github.com/torvalds/linux"
 depends="postmarketos-mkinitfs"
 makedepends="perl sed installkernel bash gmp-dev bc linux-headers elfutils-dev python2"
 options="!strip !check !tracedeps"
 install=
 source="
-	https://github.com/LineageOS/android_kernel_lge_hammerhead/archive/${_hash}.zip
+	https://github.com/torvalds/linux/archive/${_hash}.tar.gz
 	${_config}
 	compiler-gcc6.h
-	aeea3592a13bf12861943e44fc48f1f270941f8d.patch
-	gpu-msm-fix-gcc5-compile.patch
 "
 subpackages=""
 license="GPL2"
@@ -43,7 +41,7 @@ _carch="arm"
 HOSTCC="${CC:-gcc}"
 HOSTCC="${HOSTCC#${CROSS_COMPILE}}"
 
-ksrcdir="$srcdir/android_kernel_lge_hammerhead-${_hash}"
+ksrcdir="$srcdir/linux-${_hash}"
 
 prepare() {
 	local _patch_failed=
@@ -69,7 +67,7 @@ prepare() {
 	fi
 
 	# gcc6 support
-	cp -v "$srcdir/compiler-gcc6.h" "$ksrcdir/include/linux/"
+	# cp -v "$srcdir/compiler-gcc6.h" "$ksrcdir/include/linux/"
 
         mkdir -p "$srcdir"/build
         cp "$srcdir"/$_config "$srcdir"/build/.config || return 1
@@ -101,7 +99,7 @@ build() {
 }
 
 package() {
-	install -Dm644 "$srcdir/build/arch/arm/boot/zImage-dtb" \
+	install -Dm644 "$srcdir/build/arch/arm/boot/zImage" \
 		"$pkgdir/boot/vmlinuz-$_flavor"
 
 	install -D "$srcdir/build/include/config/kernel.release" \
@@ -116,8 +114,6 @@ package() {
 		|| return 1
 }
 
-sha512sums="882ec7d4ce3eadb372c1279f53fab18c5c7f18109d3df2c8c4005ec5d06e6244c2c788c3183defa4d4aaf493a5c1bf905d8bd2aeb554e4b0680b0e1b45de6742  1dae34efb7d2399073ca371c953aafd2ed503849.zip
-585412e455871eb5a8ffbc783724a66b7a2d71c10070a4bf8d070d87c16931afd78815574781bcc903baacecbfad9897f7844c8bcfd280b7eb08c7dd7f993bfd  config-lg-hammerhead.armhf
-d80980e9474c82ba0ef1a6903b434d8bd1b092c40367ba543e72d2c119301c8b2d05265740e4104ca1ac5d15f6c4aa49e8776cb44264a9a28dc551e0d1850dcc  compiler-gcc6.h
-ea1d3b5a234fa565e3c1a792de48f4fc4e6023d281d303c8e319c7ef28edc5739ab0e4dea0139a41f0a5c7d03e27921ccaa214fd0ac5c72245a094ce60128864  aeea3592a13bf12861943e44fc48f1f270941f8d.patch
-7be03a9e78b7ac330a54b1f00509caa0621a95c0c55901878ad757f9dd69cc05ba2c8b5ea987063ae1224f92c4d090d515fa5d369e7755181a4871b0d0f82881  gpu-msm-fix-gcc5-compile.patch"
+sha512sums="bc6ecc7a479a6099886c2b36961c8bb8507d240f75e814005dc69f8295e0c024bc43daf909da605f2b415a48272b484a5ad282f856bffa64eee05630fa6609c4  ea094f3c830a67f252677aacba5d04ebcf55c4d9.tar.gz
+9a447fec16da34b274a580775f53386bec4b9ca5fcfcb74a8e6dc858b7ca725c47761d1e722fb16e02de423bb488ff938128a269222238ce19996cac7439761a  config-lg-hammerhead.armhf
+d80980e9474c82ba0ef1a6903b434d8bd1b092c40367ba543e72d2c119301c8b2d05265740e4104ca1ac5d15f6c4aa49e8776cb44264a9a28dc551e0d1850dcc  compiler-gcc6.h"
