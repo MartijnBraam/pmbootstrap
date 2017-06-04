@@ -1,0 +1,27 @@
+pkgname=device-huawei-g510
+pkgver=1
+pkgrel=2
+pkgdesc="Huawei Ascend G510-100"
+url="https://github.com/postmarketOS"
+arch="noarch"
+license="MIT"
+depends="linux-huawei-g510"
+makedepends=""
+install=""
+subpackages=""
+source="deviceinfo 90-android.rules"
+options="!check"
+
+build() {
+	return 0
+}
+
+package() {
+	install -D -m644 "$srcdir/deviceinfo" \
+		"$pkgdir/etc/deviceinfo"
+	install -D -m644 "$srcdir"/90-android.rules \
+		"$pkgdir"/etc/udev/rules.d/90-android.rules
+}
+
+sha512sums="dbff9e0079b2afd824312ae159220f885fdda3353af2bba4c1c9a1ff388e2a7556b66875ceb7652f3ab50e1ca074654995f36c27778cf16bd2433b59640008e4  deviceinfo
+8aead706ddb118a44de7d049f07d10a27e727d17724058d132e4ec4fa73fed29c9ccfe03f02aca459c922ec0fbba24e171fe3c76e33f7c5462631e3dd5506e36  90-android.rules"
