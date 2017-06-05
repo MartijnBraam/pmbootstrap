@@ -13,6 +13,7 @@ _vendor=lg
 _flavor=lg-hammerhead
 _hash="ea094f3c830a67f252677aacba5d04ebcf55c4d9"
 _config="config-${_flavor}.armhf"
+_dts="qcom-msm8974-lge-nexus5-hammerhead.dtb"
 
 pkgname=linux-${_flavor}
 pkgver=4.11
@@ -96,11 +97,20 @@ build() {
 	make ARCH="$_carch" CC="${CC:-gcc}" \
 		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine" CONFIG_NO_ERROR_ON_MISMATCH=y \
 		modules || return 1
+	echo "--[ Build device trees ]--"
+	make ARCH="$_carch" CC="${CC:-gcc}" \
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine" CONFIG_NO_ERROR_ON_MISMATCH=y \
+		qcom-msm8974-lge-nexus5-hammerhead.dtb || return 1
 }
 
 package() {
 	install -Dm644 "$srcdir/build/arch/arm/boot/zImage" \
-		"$pkgdir/boot/vmlinuz-$_flavor"
+		"$pkgdir/boot/vmlinuz-${_flavor}-clean"
+
+	install -Dm644 "$srcdir/build/arch/arm/boot/dts/${_dts}" \
+		"$pkgdir/boot/${_flavor}.dtb"
+
+	cat "$pkgdir/boot/vmlinuz-${_flavor}-clean" "$pkgdir/boot/${_flavor}.dtb" > "$pkgdir/boot/vmlinuz-${_flavor}"
 
 	install -D "$srcdir/build/include/config/kernel.release" \
 		"$pkgdir/usr/share/kernel/$_flavor/kernel.release"
@@ -115,5 +125,5 @@ package() {
 }
 
 sha512sums="bc6ecc7a479a6099886c2b36961c8bb8507d240f75e814005dc69f8295e0c024bc43daf909da605f2b415a48272b484a5ad282f856bffa64eee05630fa6609c4  ea094f3c830a67f252677aacba5d04ebcf55c4d9.tar.gz
-9a447fec16da34b274a580775f53386bec4b9ca5fcfcb74a8e6dc858b7ca725c47761d1e722fb16e02de423bb488ff938128a269222238ce19996cac7439761a  config-lg-hammerhead.armhf
+086c266a2bcf181df5a3ad7c5a70a7d0d4b7bdfb8fa800e5633e2eb5dc13b91ea3fadd7cd9a56a23d38de50bd3da596b12e9326554dc141fad7170aa0b3d3b37  config-lg-hammerhead.armhf
 d80980e9474c82ba0ef1a6903b434d8bd1b092c40367ba543e72d2c119301c8b2d05265740e4104ca1ac5d15f6c4aa49e8776cb44264a9a28dc551e0d1850dcc  compiler-gcc6.h"
