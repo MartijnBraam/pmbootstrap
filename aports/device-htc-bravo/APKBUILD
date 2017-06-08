@@ -1,0 +1,30 @@
+pkgname=device-htc-bravo
+pkgver=1
+pkgrel=1
+pkgdesc="HTC Desire"
+url="https://github.com/postmarketOS"
+arch="noarch"
+license="MIT"
+depends="linux-htc-bravo"
+makedepends=""
+install=""
+subpackages=""
+source="deviceinfo"
+options="!check"
+
+build() {
+	return 0
+}
+
+package() {
+	install -D -m644 "$srcdir"/deviceinfo \
+		"$pkgdir"/etc/deviceinfo
+	install -D -m644 "$srcdir"/initfs-hook.sh \
+		"$pkgdir"/etc/postmarketos-mkinitfs/hooks/00-${pkgname}.sh
+	install -D -m644 "$srcdir"/90-android-touch-dev.rules \
+		"$pkgdir"/etc/udev/rules.d/90-android-touch-dev.rules
+	install -D -m644 "$srcdir"/profile.sh \
+		"$pkgdir"/etc/profile.d/00-$pkgname.sh
+}
+
+sha512sums="17c79243fe174ebe2d4c7925e43705a74fc4ab26b4f338e627ebdaf72708dee48862d61a542e87ad6da5c81379f2104e9068fddf8d34300a8ab42d1020c62730  deviceinfo"
