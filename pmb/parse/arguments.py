@@ -73,12 +73,16 @@ def arguments():
     # Actions
     sub = parser.add_subparsers(title="action", dest="action")
     sub.add_parser("init", help="initialize config file")
-    sub.add_parser("log", help="follow the pmbootstrap logfile")
-    sub.add_parser("log_distccd", help="follow the distccd logfile")
     sub.add_parser("shutdown", help="umount, unregister binfmt")
     sub.add_parser("index", help="re-index all repositories with custom built"
                    " packages (do this after manually removing package files)")
     arguments_flasher(sub)
+
+    # Action: log
+    log = sub.add_parser("log", help="follow the pmbootstrap logfile")
+    log_distccd = sub.add_parser("log_distccd", help="follow the distccd logfile")
+    for action in [log, log_distccd]:
+        action.add_argument("-n", "--lines", default="30", help="count of initial output lines")
 
     # Action: zap
     zap = sub.add_parser("zap", help="safely delete chroot"
@@ -108,6 +112,8 @@ def arguments():
                          " eg. /dev/mmcblk0")
     install.add_argument("--cipher", help="cryptsetup cipher used to"
                          " encrypt the system partition, eg. aes-xts-plain64")
+    install.add_argument("--add", help="comma separated list of packages to be"
+                         " added to the rootfs (e.g. 'vim,gcc')")
 
     # Action: build / checksum / menuconfig / parse_apkbuild / aportgen
     menuconfig = sub.add_parser("menuconfig", help="run menuconfig on"
