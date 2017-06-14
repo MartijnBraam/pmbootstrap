@@ -1,0 +1,27 @@
+pkgname=device-raspberrypi-3
+pkgver=1
+pkgrel=1
+pkgdesc="Raspberry Pi 3"
+url="https://github.com/postmarketOS"
+arch="noarch"
+license="MIT"
+depends="linux-vanilla"
+makedepends=""
+install=""
+subpackages=""
+source="deviceinfo initfs-hook.sh"
+options="!check"
+
+build() {
+	return 0
+}
+
+package() {
+	install -D -m644 "$srcdir"/deviceinfo \
+		"$pkgdir"/etc/deviceinfo
+	install -D -m644 "$srcdir"/initfs-hook.sh \
+		"$pkgdir"/etc/postmarketos-mkinitfs/hooks/00-${pkgname}.sh
+}
+
+sha512sums="c8f67a38d0658e35c7332c6d311c4d5c9d23b85ed03371280ea70e5b79000c11bea91c04b036ca81945075727670f73f61d318958035d90da3cb9548822ba94a  deviceinfo
+8590967fa10388a890fdfafdb1070b9ab22dc89e06a3a8834806c772191e3b67de7b914b0d68e5ddf581cee715cb90f3f24abcb8762c415ff328c6da23e55d52  initfs-hook.sh"
