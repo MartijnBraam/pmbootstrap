@@ -11,26 +11,27 @@
 
 _vendor=lg
 _flavor=lg-hammerhead
-_hash="ea094f3c830a67f252677aacba5d04ebcf55c4d9"
+_hash="4bb19be273920a9a05d918ed3f8b7fc60b9536bc"
+_github="bhush9/linux"
 _config="config-${_flavor}.armhf"
 _dts="qcom-msm8974-lge-nexus5-hammerhead.dtb"
 
 pkgname=linux-${_flavor}
-pkgver=4.11
+pkgver=4.7
 case $pkgver in
 	*.*.*)  _kernver=${pkgver%.*};;
 	*.*) _kernver=$pkgver;;
 esac
-pkgrel=4
+pkgrel=5
 arch="armhf"
 pkgdesc="Linux mainline for Nexus 5 hammerhead"
-url="https://github.com/torvalds/linux"
+url="https://github.com/${_github}"
 depends="postmarketos-mkinitfs"
 makedepends="perl sed installkernel bash gmp-dev bc linux-headers elfutils-dev python2"
 options="!strip !check !tracedeps"
 install=
 source="
-	https://github.com/torvalds/linux/archive/${_hash}.tar.gz
+	https://github.com/${_github}/archive/${_hash}.tar.gz
 	${_config}
 	compiler-gcc6.h
 "
@@ -123,6 +124,6 @@ package() {
 		INSTALL_MOD_PATH="$pkgdir" modules_install \
 		|| return 1
 }
-sha512sums="bc6ecc7a479a6099886c2b36961c8bb8507d240f75e814005dc69f8295e0c024bc43daf909da605f2b415a48272b484a5ad282f856bffa64eee05630fa6609c4  ea094f3c830a67f252677aacba5d04ebcf55c4d9.tar.gz
-086c266a2bcf181df5a3ad7c5a70a7d0d4b7bdfb8fa800e5633e2eb5dc13b91ea3fadd7cd9a56a23d38de50bd3da596b12e9326554dc141fad7170aa0b3d3b37  config-lg-hammerhead.armhf
+sha512sums="5933adf2cffbba0a7787370bd2d938cff24adb1d04bcc8d67807ce80c58d06bf4f738c16589cb9b1df1b05591f7c55da1ceaefd43a495f09a98686f460692e3a  4bb19be273920a9a05d918ed3f8b7fc60b9536bc.tar.gz
+e25a1f894f5b4cf41cef62078ddd57bc6505e1c792d4b860ac3fd459664bb0a6ae8ef181963d9a761cb2561babae273944c8886f788da8ba807c7d822e8e9996  config-lg-hammerhead.armhf
 d80980e9474c82ba0ef1a6903b434d8bd1b092c40367ba543e72d2c119301c8b2d05265740e4104ca1ac5d15f6c4aa49e8776cb44264a9a28dc551e0d1850dcc  compiler-gcc6.h"
