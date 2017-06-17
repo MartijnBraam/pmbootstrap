@@ -39,7 +39,7 @@ def generate(args, pkgname):
 
     replace_functions = {
         "build": """
-            _target="$(arch_to_hostspec armhf)"
+            _target="$(arch_to_hostspec """ + arch + """)"
             cd "$builddir"
             "$builddir"/configure \\
                 --build="$CBUILD" \\
@@ -50,6 +50,7 @@ def generate(args, pkgname):
                 --enable-ld=default \\
                 --enable-gold=yes \\
                 --enable-plugins \\
+                --enable-deterministic-archives \\
                 --disable-multilib \\
                 --disable-werror \\
                 --disable-nls \\

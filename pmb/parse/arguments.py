@@ -41,6 +41,39 @@ def arguments_flasher(subparser):
     return ret
 
 
+def arguments_initfs(subparser):
+    ret = subparser.add_parser(
+        "initfs", help="do something with the initramfs")
+    sub = ret.add_subparsers(dest="action_initfs")
+
+    # hook ls
+    sub.add_parser(
+        "hook_ls",
+        help="list available and installed hook packages")
+
+    # hook add/del
+    hook_add = sub.add_parser("hook_add", help="add a hook package")
+    hook_del = sub.add_parser("hook_del", help="uninstall a hook package")
+    for action in [hook_add, hook_del]:
+        action.add_argument("hook", help="name of the hook aport, without the"
+                            " '" + pmb.config.initfs_hook_prefix + "' prefix, for example: 'usb-shell'")
+
+    # ls, build, extract
+    ls = sub.add_parser("ls", help="list initramfs contents")
+    build = sub.add_parser("build", help="(re)build the initramfs")
+    extract = sub.add_parser(
+        "extract",
+        help="extract the initramfs to a temporary folder")
+    for action in [ls, build, extract]:
+        action.add_argument(
+            "--flavor",
+            default=None,
+            help="name of the kernel flavor (run 'pmbootstrap flasher list_flavors'"
+            " to get a list of all installed flavors")
+
+    return ret
+
+
 def arguments():
     parser = argparse.ArgumentParser(prog="pmbootstrap")
 
@@ -77,12 +110,19 @@ def arguments():
     sub.add_parser("index", help="re-index all repositories with custom built"
                    " packages (do this after manually removing package files)")
     arguments_flasher(sub)
+    arguments_initfs(sub)
 
     # Action: log
     log = sub.add_parser("log", help="follow the pmbootstrap logfile")
-    log_distccd = sub.add_parser("log_distccd", help="follow the distccd logfile")
+    log_distccd = sub.add_parser(
+        "log_distccd",
+        help="follow the distccd logfile")
     for action in [log, log_distccd]:
-        action.add_argument("-n", "--lines", default="30", help="count of initial output lines")
+        action.add_argument(
+            "-n",
+            "--lines",
+            default="30",
+            help="count of initial output lines")
 
     # Action: zap
     zap = sub.add_parser("zap", help="safely delete chroot"
@@ -126,8 +166,18 @@ def arguments():
                            " specific architecture")
     build.add_argument("--arch")
     build.add_argument("--force", action="store_true")
+    build.add_argument("--buildinfo", action="store_true")
     for action in [checksum, build, menuconfig, parse_apkbuild, aportgen]:
         action.add_argument("package")
+
+    # Action: challenge
+    challenge = sub.add_parser("challenge",
+                               help="rebuild a package and diff its contents")
+    challenge.add_argument("--output-repo-changes", dest="output_repo_changes",
+                           help="pass the path to a file here, to store a list"
+                                " of apk- and APKINDEX-files that have been"
+                                " changed during the build", default=None)
+    challenge.add_argument("apk")
 
     # Use defaults from the user's config file
     args = parser.parse_args()
@@ -144,8 +194,18 @@ def arguments():
     # Add convinience shortcuts
     setattr(args, "arch_native", pmb.parse.arch.alpine_native())
 
-    # Add the deviceinfo (only after initialization)
+    # Add and verify the deviceinfo (only after initialization)
     if args.action != "init":
         setattr(args, "deviceinfo", pmb.parse.deviceinfo(args))
+        arch = args.deviceinfo["arch"]
+        if (arch != args.arch_native and
+                arch not in pmb.config.build_device_architectures):
+            raise ValueError("Arch '" + arch + "' is not officially enabled"
+                             " in postmarketOS yet. However, this should be straight"
+                             " forward. Simply enable it in pmb/config/__init__.py"
+                             " in build_device_architectures, zap your package cache"
+                             " (otherwise you will have issues with noarch packages)"
+                             " and try again. Some other things might break, but"
+                             " they should be easy to fix them.")
 
     return args
